@@ -16,7 +16,7 @@ The service exposes item CRUD over HTTP behind a layered architecture. An endpoi
 ```bash
 just install
 just deps
-just verify
+just check
 ```
 
 ## Commands
@@ -25,12 +25,15 @@ just verify
 | --- | --- |
 | `just install` | Installs the pinned tools. |
 | `just deps` | Restores the NuGet dependencies. |
+| `just fmt-check` | Fails when a C# source is not `dotnet format`-formatted. |
 | `just lint` | Runs the linters. |
 | `just test` | Runs the xUnit suite. |
 | `just coverage` | Runs the tests and writes `coverage/lcov.info`. |
 | `just spec` | Regenerates `docs/openapi.json` from the running application. |
 | `just serve` | Builds and serves the API on port 5080. |
-| `just verify` | Lints and tests. |
+| `just check` | Runs everything CI requires: format, lint, complexity, tests, and the API document diff. |
+| `just hooks` | Installs the `pre-push` guard that refuses a push to `main`. |
+| `just agent-files` | Checks the skill tree and its Claude Code links. |
 
 ## Documentation
 
