@@ -15,6 +15,14 @@ install:
 deps:
     mise exec -- dotnet restore
 
+# Format the C# sources with dotnet format.
+fmt:
+    mise exec -- dotnet format fixture-dotnet.slnx
+
+# Fail when a C# source is not dotnet-format-formatted.
+fmt-check:
+    mise exec -- dotnet format fixture-dotnet.slnx --verify-no-changes
+
 # Run every linter over the tracked files.
 lint:
     mise exec -- flint run --full
@@ -37,19 +45,35 @@ test:
 
 # Run the tests and write an lcov report to coverage/lcov.info.
 coverage:
-    node scripts/coverage.mjs
+    mise exec -- node scripts/coverage.mjs
 
 # Regenerate docs/openapi.json from the running application.
 spec:
-    node scripts/write-openapi.mjs
+    mise exec -- node scripts/write-openapi.mjs
+
+# Fail when the generated API document differs from the code.
+spec-check:
+    just spec
+    git diff --exit-code -- docs/openapi.json
 
 # Build and serve the API on http://127.0.0.1:5080.
 serve:
     mise run serve
 
-# Lint, check complexity, and test.
-verify: lint complexity test
+# Everything CI requires.
+check: fmt-check lint complexity test spec-check
+
+# Historical alias for `check`, kept for the support template.
+verify: check
+
+# Install the guarded git hook.
+hooks:
+    git config --local core.hooksPath .githooks
+
+# Check the .agents/skills tree and its .claude/skills links.
+agent-files:
+    mise exec -- node scripts/agent-files.mjs
 
 # Prune remote-tracking refs and delete local branches merged into main.
 prune:
-    node scripts/prune.mjs
+    mise exec -- node scripts/prune.mjs
